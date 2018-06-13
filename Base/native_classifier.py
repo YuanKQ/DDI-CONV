@@ -5,7 +5,7 @@
 @software: PyCharm
 @file: native_classifier.py
 @time: 18-6-13 下午6:25
-@description:
+@description: 直接将药物特征扔到conv分类器中
 """
 import sys
 sys.path.extend(['/home/cdy/ykq/DDISuccess', '/home/cdy/ykq/DDISuccess/Base'])
