@@ -16,34 +16,35 @@ sys.path.extend(['/run/media/yuan/264f0d05-f992-4549-9c98-eb219b36e8d8/PycharmPr
 import pickle
 import numpy as np
 
-from Data.utils import shuffle_data, dump_dataset, load_drugs_list
+from utils import shuffle_data, dump_dataset, load_drugs_list
 
-# with open("../Data/ddi_rel_v5.pickle", "rb") as rf:
-#     ddi_increase = pickle.load(rf)
-#     ddi_decrease = pickle.load(rf)
-# # print("increase:", ddi_increase[0])
-# # print("decrease:", ddi_decrease[0])
-#
-# with open("../Data/drug_features_dict_v5.pickle", "rb") as rf:
-#     features_dict = pickle.load(rf)
-#
-# drugs = load_drugs_list("../Data/drugs_ddi_v5.pickle")
-# drug_features_dict = {}
-# for drug in drugs:
-#     drug_features_dict[drug] = np.concatenate((features_dict[drug]["actionCode"],
-#                                               features_dict[drug]["atc"],
-#                                               features_dict[drug]["MACCS"],
-#                                               features_dict[drug]["SIDER"],
-#                                               features_dict[drug]["phyCode"],
-#                                               features_dict[drug]["target"])
-#                                               )
-#
-# increase_feature_matrix, increase_lab_matrix = shuffle_data(ddi_increase, drug_features_dict)
-# decrease_feature_matrix, decrease_lab_matrix = shuffle_data(ddi_decrease, drug_features_dict)
-# dump_dataset(increase_feature_matrix, increase_lab_matrix, "BaseDataset/increase_features_labs_matrix")
-# dump_dataset(decrease_feature_matrix, decrease_lab_matrix, "BaseDataset/decrease_features_labs_matrix")
+with open("../Data/ddi_rel_v5.pickle", "rb") as rf:
+    ddi_increase = pickle.load(rf)
+    ddi_decrease = pickle.load(rf)
+# print("increase:", ddi_increase[0])
+# print("decrease:", ddi_decrease[0])
 
-with open("BaseDataset/decrease_features_labs_matrix_0.pickle", "rb") as rf:
-    drug1 = pickle.load(rf)
-with open("BaseDataset/decrease_features_labs_matrix_1.pickle", "rb") as rf:
-    drug2 = pickle.load(rf)
+with open("../Data/drug_features_dict_v5.pickle", "rb") as rf:
+    features_dict = pickle.load(rf)
+
+drugs = load_drugs_list("../Data/drugs_ddi_v5.pickle")
+drug_features_dict = {}
+for drug in drugs:
+    drug_features_dict[drug] = np.concatenate((features_dict[drug]["actionCode"],
+                                              features_dict[drug]["atc"],
+                                              features_dict[drug]["MACCS"],
+                                              features_dict[drug]["SIDER"],
+                                              features_dict[drug]["phyCode"],
+                                              features_dict[drug]["target"])
+                                              )
+
+increase_feature_matrix, increase_lab_matrix = shuffle_data(ddi_increase, drug_features_dict)
+decrease_feature_matrix, decrease_lab_matrix = shuffle_data(ddi_decrease, drug_features_dict)
+dump_dataset(increase_feature_matrix, increase_lab_matrix, "BaseDataset/increase_features_labs_matrix")
+dump_dataset(decrease_feature_matrix, decrease_lab_matrix, "BaseDataset/decrease_features_labs_matrix")
+
+## TEST
+# with open("BaseDataset/decrease_features_labs_matrix_0.pickle", "rb") as rf:
+#     drug1 = pickle.load(rf)
+# with open("BaseDataset/decrease_features_labs_matrix_1.pickle", "rb") as rf:
+#     drug2 = pickle.load(rf)
