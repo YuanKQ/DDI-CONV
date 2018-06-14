@@ -12,24 +12,11 @@ sys.path.extend(['/home/cdy/ykq/DDISuccess', '/home/cdy/ykq/DDISuccess/Base'])
 
 import numpy as np
 
-from utils import load_dataset_split, permute_dataset
+from utils import load_dataset_split, permute_dataset, lenet5
 import tensorflow as tf
 import prettytensor as pt
 
-def lenet5(images, labels, dim_y):
-     """Creates a multi layer convolutional network.
-     The architecture is similar to that defined in LeNet 5.
-     Please change this to experiment with architectures.
-     Args:
-       images: The input images.
-       labels: The labels as dense one-hot vectors.
-     Returns:
-       A softmax result.
-     """
-     images = pt.wrap(images)
-     with pt.defaults_scope(activation_fn=tf.nn.relu, l2loss=0.00001):
-        return (images.conv2d(5, 20).max_pool(2, 2).conv2d(5, 50).max_pool(2, 2)
-                .flatten().fully_connected(500).softmax_classifier(dim_y, labels))
+
 
 
 num_batches = 100  # Number of minibatches in a single epoch

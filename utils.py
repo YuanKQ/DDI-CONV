@@ -10,6 +10,8 @@
 import pickle
 import random
 import numpy as np
+import prettytensor as pt
+import tensorflow as tf
 
 
 def build_drug_feature_matrix(ddi_file, file_prefix, targetfile):
@@ -182,6 +184,21 @@ def load_dataset(path, start=0,sample_size=3, valid_test_ratio=50):
     return np.array(x_train), np.array(y_train), np.array(valid_x), \
            np.array(valid_y), np.array(test_x), np.array(test_y)
 
+
+def lenet5(images, labels, dim_y):
+    """Creates a multi layer convolutional network.
+    The architecture is similar to that defined in LeNet 5.
+    Please change this to experiment with architectures.
+    Args:
+      images: The input images.
+      labels: The labels as dense one-hot vectors.
+    Returns:
+      A softmax result.
+    """
+    images = pt.wrap(images)
+    with pt.defaults_scope(activation_fn=tf.nn.relu, l2loss=0.00001):
+        return (images.conv2d(5, 20).max_pool(2, 2).conv2d(5, 50).max_pool(2, 2)
+                .flatten().fully_connected(500).softmax_classifier(dim_y, labels))
 
 if __name__ == '__main__':
     build_drug_feature_matrix("drugs_ddi_v5.pickle", "", "drug_features_dict_v5.pickle")
