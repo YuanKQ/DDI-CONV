@@ -8,6 +8,7 @@
 @description: 药物特征（flatten为一维）经过处理后再拼接在一起输入到conv分类器中
  - 矩阵变换后: start with 65.667, end with 82, best is 86.5
  - 加上衡量数据的离散程度: start with 61.8333
+ - 加入距离公式： start with 66.3333
 """
 import sys
 import time
@@ -44,12 +45,23 @@ trans_matrix = tf.Variable(tf.float32, [batch_size, feature_dim, latent_dim])
 head_trans = tf.matmul(head_data_placeholder, trans_matrix)
 tail_trans = tf.matmul(tail_data_placeholder, trans_matrix)\
 
+# 欧拉距离
+euclidean = tf.sqrt(tf.reduce_sum(tf.square(head_trans-tail_trans), axis=1))
+# 余弦距离
+head_norm = tf.sqrt(tf.reduce_sum(tf.squre(head_trans), axis=1))
+tail_norm = tf.sqrt(tf.reduce_sum(tf.squre(tail_trans), axis=1))
+head_tail_product = tf.reduce_sum(head_trans * tail_trans, axis=1)
+cosine = head_tail_product / (head_norm * tail_norm)
+
 ## 矩阵变换：
 # input_data = tf.reshape(tf.concat([head_trans, tail_trans], 1), [batch_size, dim_x, 1])
 ## 加入衡量数据偏离程度
 mean = tf.add(head_data_placeholder, tail_data_placeholder)/2
 msr_vec = tf.sqrt(tf.add(tf.square(tf.sub(head_data_placeholder, mean)), tf.square(tf.sub(head_data_placeholder, mean))))
-input_data = tf.reshape(tf.concat([head_trans, tail_trans, msr_vec], 1), [batch_size, dim_x+feature_dim, 1])
+# input_data = tf.reshape(tf.concat([head_trans, tail_trans, msr_vec], 1), [batch_size, dim_x+feature_dim, 1])
+## 加入距离公式
+input_data = tf.reshape(tf.concat([head_trans, tail_trans, msr_vec, euclidean, cosine], 1), [batch_size, dim_x+feature_dim+2, 1])
+
 print("input_data shape: ", input_data.shape)
 result = lenet5(input_data, labels_placeholder, dim_y)
 accuracy = result.softmax.evaluate_classifier(labels_placeholder, phase=pt.Phase.test)
