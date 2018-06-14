@@ -5,7 +5,9 @@
 @software: PyCharm
 @file: vec_transfer_classifier.py
 @time: 18-6-13 下午9:25
-@description: 药物特征（flatten为一维）经过矩阵变换后再拼接在一起输入到conv分类器中
+@description: 药物特征（flatten为一维）经过处理后再拼接在一起输入到conv分类器中
+ - 矩阵变换后: start with 65.667, end with 82, best is 86.5
+ - 加上衡量数据的离散程度: start with 61.8333
 """
 import sys
 import time
@@ -37,11 +39,18 @@ head_data_placeholder = tf.placeholder(tf.float32, [batch_size, feature_dim])
 tail_data_placeholder = tf.placeholder(tf.float32, [batch_size, feature_dim])
 labels_placeholder    = tf.placeholder(tf.float32, [batch_size, dim_y])
 
-# 加入衡量数据偏离程度
-mean = tf.add(head_data_placeholder, tail_data_placeholder)/2
-msr_vec = tf.sqrt(tf.add(tf.square(tf.subtract(head_data_placeholder, mean)), tf.square(tf.subtract(head_data_placeholder, mean))))
-input_data = tf.reshape(tf.concat([head_data_placeholder, head_data_placeholder, msr_vec], 1), [batch_size, dim_x+feature_dim, 1, 1])
+trans_matrix = tf.Variable(tf.float32, [batch_size, feature_dim, latent_dim])
 
+head_trans = tf.matmul(head_data_placeholder, trans_matrix)
+tail_trans = tf.matmul(tail_data_placeholder, trans_matrix)\
+
+## 矩阵变换：
+# input_data = tf.reshape(tf.concat([head_trans, tail_trans], 1), [batch_size, dim_x, 1])
+## 加入衡量数据偏离程度
+mean = tf.add(head_data_placeholder, tail_data_placeholder)/2
+msr_vec = tf.sqrt(tf.add(tf.square(tf.sub(head_data_placeholder, mean)), tf.square(tf.sub(head_data_placeholder, mean))))
+input_data = tf.reshape(tf.concat([head_trans, tail_trans, msr_vec], 1), [batch_size, dim_x+feature_dim, 1])
+print("input_data shape: ", input_data.shape)
 result = lenet5(input_data, labels_placeholder, dim_y)
 accuracy = result.softmax.evaluate_classifier(labels_placeholder, phase=pt.Phase.test)
 optimizer = tf.train.GradientDescentOptimizer(learning_rate)
